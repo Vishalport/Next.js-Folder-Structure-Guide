@@ -1,10 +1,10 @@
 import React from 'react'
-import LoginPage from '../../component/user/login/LoginPage'
+import LoginForm from '../../component/user/login/LoginForm'
 
 export default function index() {
-  return (
-    <div>
-      <LoginPage/>
-    </div>
-  )
+    return (
+        <div>
+            <LoginForm/>
+        </div>
+    )
 }
