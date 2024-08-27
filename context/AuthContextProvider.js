@@ -17,6 +17,7 @@ const AuthContextProvider = ({ children }) => {
         const body = { email, password };
         try {
             const response = await axios.post("http://localhost:8521/api/v1/user/login", body);
+            console.log("-----------response-------",response);
             const result = handleApiResponse(response);
             if (result.success) {
                 const token = result?.data;
@@ -30,7 +31,7 @@ const AuthContextProvider = ({ children }) => {
             }
         } catch (error) {
             console.error("Login Error:", error);
-            alert("An unexpected error occurred. Please try again.");
+            alert(`${error.response.data.responseMessage}`)
         }
     };
 
