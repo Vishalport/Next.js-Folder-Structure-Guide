@@ -17,11 +17,10 @@ const AuthContextProvider = ({ children }) => {
         const body = { email, password };
         try {
             const response = await axios.post("http://localhost:8521/api/v1/user/login", body);
-            console.log("-----------response-------",response);
             const result = handleApiResponse(response);
             if (result.success) {
                 const token = result?.data;
-                if (token) {
+                if (token) {git
                     Cookies.set('__secrete_jwt_auth', token.__secrete_jwt_auth, { expires: 5 });
                     setUserAuth(result?.data.__secrete_jwt_auth);
                     router.push("/");
