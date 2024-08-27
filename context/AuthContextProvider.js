@@ -11,30 +11,36 @@ const AuthContextProvider = ({ children }) => {
 
     useEffect(() => {
         const token = Cookies.get('token');
-        if (token) { 
-            setUserAuth(token); 
+        if (token) {
+            setUserAuth(token);
         }
     }, []);
 
     const login = async (email, password) => {
         const body = { email, password };
         try {
-            const response = await axios.post("http://localhost:8521/api/v1/user/login", body, {
-            });
-            const result = handleApiResponse(response);
-            if (result.success) {
-                sessionStorage.setItem('__user_email', JSON.stringify(result?.data?.email));
-                Cookies.set('token', result?.data?.token, { expires: 1 }); // Set token with an expiration of 1 day
-                setUserAuth(result?.data?.token);
-                router.push("/");
+            const response = await axios.post("http://localhost:8521/api/v1/user/login", body);
+            if (response.status === 200) {
+                const result = handleApiResponse(response);
+                if (result.success) {
+                    sessionStorage.setItem('__user_email', JSON.stringify(result?.data?.email));
+                    setUserAuth(result?.data?.token);
+                    router.push("/");
+                } else {
+                    alert(result.message);
+                }
             } else {
-                alert(result.message);
+                alert("An unexpected error occurred. Please try again.");
             }
         } catch (error) {
-            console.error("Login Error:", error);
-            alert("An unexpected error occurred. Please try again.");
+            if (error.response && error.response.data) {
+                alert(error.response.data.responseMessage || "An unexpected error occurred. Please try again.");
+            } else {
+                alert("An unexpected error occurred. Please try again.");
+            }
         }
     };
+    
 
     const logout = async () => {
         try {
