@@ -1,13 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Modal = ({ isOpen, onClose, username }) => {
+const Modal = ({ isOpen, onClose, userInfo }) => {
   if (!isOpen) return null;
+
+  const { email, firstName, lastName, mobileNumber, userType, createdAt, updatedAt } = userInfo;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">User Information</h2>
-        <p className="modal-username">Username: {sessionStorage.getItem("__user_email")}</p>
+        <p><strong>First Name:</strong> {firstName}</p>
+        <p><strong>Last Name:</strong> {lastName}</p>
+        <p><strong>Email:</strong> {email}</p>
+        <p><strong>Mobile Number:</strong> {mobileNumber}</p>
+        <p><strong>User Type:</strong> {userType}</p>
+        <p><strong>Created At:</strong> {new Date(createdAt).toLocaleString()}</p>
         <button className="modal-close" onClick={onClose}>Close</button>
         <style jsx>{`
           .modal-overlay {
@@ -37,9 +45,9 @@ const Modal = ({ isOpen, onClose, username }) => {
             margin-bottom: 1rem;
             color: #333; /* Darker text color */
           }
-          .modal-username {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
+          p {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
             color: #666; /* Lighter text color */
           }
           .modal-close {
@@ -68,7 +76,7 @@ const Modal = ({ isOpen, onClose, username }) => {
 Modal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  username: PropTypes.string,
+  userInfo: PropTypes.object.isRequired,
 };
 
 export default Modal;

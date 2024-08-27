@@ -3,49 +3,40 @@ import axios from "axios";
 import AuthContext from "./AuthContext";
 import { useRouter } from "next/router";
 import { handleApiResponse } from '../helper/handleApiResponse';
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"
 
 const AuthContextProvider = ({ children }) => {
     const [userAuth, setUserAuth] = useState(null);
     const router = useRouter();
 
     useEffect(() => {
-        const token = Cookies.get('token');
-        if (token) {
-            setUserAuth(token);
-        }
-    }, []);
-
+        setUserAuth(Cookies.get("__secrete_jwt_auth"))
+    }, [])
+    
     const login = async (email, password) => {
         const body = { email, password };
         try {
             const response = await axios.post("http://localhost:8521/api/v1/user/login", body);
-            if (response.status === 200) {
-                const result = handleApiResponse(response);
-                if (result.success) {
-                    sessionStorage.setItem('__user_email', JSON.stringify(result?.data?.email));
-                    setUserAuth(result?.data?.token);
+            const result = handleApiResponse(response);
+            if (result.success) {
+                const token = result?.data;
+                if (token) {
+                    Cookies.set('__secrete_jwt_auth', token.__secrete_jwt_auth, { expires: 5 });
+                    setUserAuth(result?.data.__secrete_jwt_auth);
                     router.push("/");
-                } else {
-                    alert(result.message);
                 }
             } else {
-                alert("An unexpected error occurred. Please try again.");
+                alert(result.message);
             }
         } catch (error) {
-            if (error.response && error.response.data) {
-                alert(error.response.data.responseMessage || "An unexpected error occurred. Please try again.");
-            } else {
-                alert("An unexpected error occurred. Please try again.");
-            }
+            console.error("Login Error:", error);
+            alert("An unexpected error occurred. Please try again.");
         }
     };
-    
 
     const logout = async () => {
         try {
-            Cookies.remove('token');
-            sessionStorage.removeItem('__user_email');
+            Cookies.remove('__secrete_jwt_auth');
             setUserAuth(null);
             router.push('/sign-in');
         } catch (error) {
@@ -53,25 +44,10 @@ const AuthContextProvider = ({ children }) => {
         }
     };
 
-    const getProfile = async () => {
-        try {
-            const user = sessionStorage.getItem('__user_email');
-            if (user) {
-                return JSON.parse(user);
-            } else {
-                alert("No user email found.");
-                router.push("/");
-                return null;
-            }
-        } catch (error) {
-            console.error("Profile Fetch Error:", error);
-            alert("An unexpected error occurred. Please try again.");
-            return null;
-        }
-    };
+
 
     return (
-        <AuthContext.Provider value={{ userAuth, login, logout, getProfile }}>
+        <AuthContext.Provider value={{ userAuth, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

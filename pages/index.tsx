@@ -7,12 +7,22 @@ import Modal from '../component/user/modal/Modal';
 const HomePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
-  const { userAuth } = useContext(AuthContext);
+  const { userAuth, logout } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState({})
+
 
   const handleInfo = async () => {
     try {
       if (userAuth) {
-        setIsModalOpen(true);
+        const response = await axios.post("http://localhost:8521/api/v1/user/get-profile", {},
+          {
+            withCredentials: true // Ensure cookies are sent with the request
+          }
+        );
+        if (response) {
+          setIsModalOpen(true);
+          setUserInfo(response?.data?.result?.userInfo)
+        }
       } else {
         router.push('/sign-in');
       }
@@ -27,17 +37,28 @@ const HomePage = () => {
   return (
     <div className="home-page-container">
       <h1 className="home-page-title">Home Page</h1>
-      <button
-        onClick={handleInfo}
-        type="button"
-        className="home-page-button"
-      >
-        Get Info
-      </button>
+      <div className="home-page-button-div">
+        <button
+          onClick={handleInfo}
+          type="button"
+          className="home-page-button"
+        >
+          Get Info
+        </button>
+
+        <button
+          onClick={logout}
+          type="button"
+          className="home-page-button"
+        >
+          {userAuth ? "Logout" : "Login"}
+        </button>
+      </div>
 
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
+        userInfo={userInfo}
       />
 
       <style jsx>{`
@@ -69,6 +90,11 @@ const HomePage = () => {
         .home-page-button:hover {
           background-color: #2b6cb0;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .home-page-button-div {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px; /* Adjust the value to control the space between items */
         }
       `}</style>
     </div>
