@@ -93,8 +93,7 @@ const HomePage = () => {
         }
         .home-page-button-div {
           display: flex;
-          justify-content: space-between;
-          gap: 10px; /* Adjust the value to control the space between items */
+          gap: 10px;
         }
       `}</style>
     </div>
